@@ -41,6 +41,25 @@ async function run(){
             const result = await allUsersCollection.insertOne(user);
             res.send(result);
         });
+
+        app.put('/sellers/verified/:id', async (req, res) => {
+            const query = {role: 'admin'};
+            const user = await allUsersCollection.findOne(query);
+            if(user?.role !== 'admin'){
+                return res.status(403).send({message: 'forbidden access'})
+            }
+            
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    verified: true
+                }
+            }
+            const result = await allUsersCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
     }
     finally{
 
