@@ -19,11 +19,16 @@ async function run(){
         const productCollection = client.db('huntYourBook').collection('products');
         const categoryCollection = client.db('huntYourBook').collection('categories');
 
-        app.get('/categories', async(req, res) =>{
-            const query = {}
-            const cursor = categoryCollection.find(query);
-            const categories = await cursor.toArray();
-            res.send(categories);
+        app.get('/products', async(req, res) =>{
+            let query = {};
+            if(req.query.category_id){
+                query = {
+                    category_id: req.query.category_id
+                }
+            }
+            const cursor = productCollection.find(query);
+            const products = await cursor.toArray();
+            res.send(products);
         });
 
         app.get('/categories/:id', async(req, res) =>{
