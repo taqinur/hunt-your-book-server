@@ -16,6 +16,22 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     try{
         const allUsersCollection = client.db('huntYourBook').collection('allUsers');
+        const productCollection = client.db('huntYourBook').collection('products');
+        const categoryCollection = client.db('huntYourBook').collection('categories');
+
+        app.get('/categories', async(req, res) =>{
+            const query = {}
+            const cursor = categoryCollection.find(query);
+            const categories = await cursor.toArray();
+            res.send(categories);
+        });
+
+        app.get('/categories/:id', async(req, res) =>{
+            const id = req.params.id;           
+            const query = {_id: ObjectId(id)};
+            const category = await categoryCollection.findOne(query);
+            res.send(category);
+        });
 
         app.get('/sellers', async (req, res) => {
             const query = { role : "seller" };
@@ -60,6 +76,31 @@ async function run(){
             const result = await allUsersCollection.updateOne(filter, updatedDoc, options);
             res.send(result);
         });
+
+        app.get('/products', async(req, res) =>{
+            let query = {};
+            if(req.query.email){
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = productCollection.find(query);
+            const products = await cursor.toArray();
+            res.send(products);
+        });
+        
+        app.post('/products', async(req, res) =>{
+            const product = req.body;
+            const result = await productCollection.insertOne(product);
+            res.send(result);
+        });
+
+        app.delete('/products/:id', async(req,res)=>{
+            const id= req.params.id;
+            const query = { _id: ObjectId(id)};
+            const result = await productCollection.deleteOne(query);
+            res.send(result);
+        })
     }
     finally{
 
