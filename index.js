@@ -31,36 +31,16 @@ async function run(){
             res.send(products);
         });
 
-        app.get('/categories/:id', async(req, res) =>{
-            const id = req.params.id;           
-            const query = {_id: ObjectId(id)};
-            const category = await categoryCollection.findOne(query);
-            res.send(category);
+        app.get('/categories', async (req, res) => {
+            const query = {};
+            const result = await categoryCollection.find(query).toArray();
+            res.send(result);
         });
 
         app.get('/sellers', async (req, res) => {
             const query = { role : "seller" };
             const sellers = await allUsersCollection.find(query).toArray();
             res.send(sellers);
-        });
-
-        app.get('/buyers', async (req, res) => {
-            const query = { role : "buyer" };
-            const buyers = await allUsersCollection.find(query).toArray();
-            res.send(buyers);
-        });
-
-        app.get('/users', async (req, res) => {
-            const query = {};
-            const result = await allUsersCollection.find(query).toArray();
-            res.send(result);
-        });
-
-        app.post('/users', async (req, res) => {
-            const user = req.body;
-            console.log(user);
-            const result = await allUsersCollection.insertOne(user);
-            res.send(result);
         });
 
         app.put('/sellers/verified/:id', async (req, res) => {
@@ -82,6 +62,39 @@ async function run(){
             res.send(result);
         });
 
+
+        app.get('/users', async(req, res) =>{
+            let query = {};
+            if(req.query.email){
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = allUsersCollection.find(query);
+            const user = await cursor.toArray();
+            res.send(user);
+        });
+
+        app.get('/buyers', async (req, res) => {
+            const query = { role : "buyer" };
+            const buyers = await allUsersCollection.find(query).toArray();
+            res.send(buyers);
+        });
+
+        app.get('/users', async (req, res) => {
+            const query = {};
+            const result = await allUsersCollection.find(query).toArray();
+            res.send(result);
+        });
+
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            console.log(user);
+            const result = await allUsersCollection.insertOne(user);
+            res.send(result);
+        });
+
+        
         app.get('/products', async(req, res) =>{
             let query = {};
             if(req.query.email){
@@ -99,6 +112,28 @@ async function run(){
             const result = await productCollection.insertOne(product);
             res.send(result);
         });
+
+        app.get('/categories/:id', async(req, res) =>{
+            const id = req.params.id;           
+            const query = {category_id: id};
+            const category = await categoryCollection.findOne(query);
+            res.send(category);
+        });
+
+
+        app.get('/users/:id', async (req, res) => {
+            const id = req.params.id;           
+            const query = {_id: ObjectId(id)};
+            const user = await allUsersCollection.findOne(query);
+            res.send(user);
+        });
+
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await allUsersCollection.deleteOne(filter);
+            res.send(result);
+        })
 
         app.delete('/products/:id', async(req,res)=>{
             const id= req.params.id;
