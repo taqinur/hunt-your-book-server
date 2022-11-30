@@ -166,11 +166,16 @@ async function run(){
             res.send(result);
         });
 
+        app.get('/products/advertised', async (req, res) => {
+            const query = { advertised: true };
+            const advertisedProducts = await productCollection.find(query).toArray();
+            res.send(advertisedProducts);
+        });
+
         app.get('/users/admin/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email }
             const user = await allUsersCollection.findOne(query);
-            console.log(user);
             res.send({ isAdmin: user?.role === 'admin' });
         })
 
