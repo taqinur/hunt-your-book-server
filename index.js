@@ -62,7 +62,6 @@ async function run(){
             res.send(result);
         });
 
-
         app.get('/users', async(req, res) =>{
             let query = {};
             if(req.query.email){
@@ -89,7 +88,6 @@ async function run(){
 
         app.post('/users', async (req, res) => {
             const user = req.body;
-            console.log(user);
             const result = await allUsersCollection.insertOne(user);
             res.send(result);
         });
@@ -141,6 +139,57 @@ async function run(){
             const result = await productCollection.deleteOne(query);
             res.send(result);
         })
+
+        app.put('/products/booked/:id', async (req, res) => {  
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    status: 'booked'
+                }
+            }
+            const result = await productCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
+
+        app.put('/products/ad/:id', async (req, res) => {  
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    advertised: true
+                }
+            }
+            const result = await productCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
+
+        app.get('/users/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await allUsersCollection.findOne(query);
+            console.log(user);
+            res.send({ isAdmin: user?.role === 'admin' });
+        })
+
+        app.get('/users/sellers/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await allUsersCollection.findOne(query);
+            res.send({ isAdmin: user?.role === 'seller' });
+        })
+
+        app.get('/users/buyers/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await allUsersCollection.findOne(query);
+            res.send({ isAdmin: user?.role === 'buyer' });
+        })
+
+       
+
     }
     finally{
 
